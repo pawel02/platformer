@@ -35,16 +35,21 @@ private:
 private:
 	sf::Texture texture;
 	sf::Sprite sprite;
-	sf::Vector2f pos;
 
 	sf::Vector2u windowSize;
 
 	EventsManager* eventsManager;
 	glm::vec2 playerSize;
 
-	glm::vec2 velocity;
 
+	// Player movement
+	sf::Vector2f pos;
+	glm::vec2 velocity = {0.0f, 0.0f};
+	bool canJump = true;
 	float movementSpeed;
+	const float slowDownSpeed = 0.005f;
+	const float gravity = 0.01f;
+	float floorPos = 0.0f;
 
 	char keys = 0x00;
 };
