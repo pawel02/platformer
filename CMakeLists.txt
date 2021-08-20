@@ -13,9 +13,24 @@ file(GLOB SOURCES
     PRIVATE "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
+file(GLOB_RECURSE EVENTSYSTEM 
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/EventSystem/*.hpp"
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/EventSystem/*.cpp"
+)
+
+file(GLOB_RECURSE GAME 
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/Game/*.hpp"
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/Game/*.cpp"
+)
+
 add_executable(${PROJECT_NAME} 
     ${SOURCES}
+    ${EVENTSYSTEM}
+    ${GAME}
 )
+
+source_group("Game"                       FILES ${GAME})
+source_group("EventSystem"                FILES ${EVENTSYSTEM})
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE "C:/libs/SFML/lib-static/include"
