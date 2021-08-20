@@ -8,6 +8,7 @@ Player::Player(const sf::Vector2u& windowSize, EventsManager* eventsManager, con
 	eventsManager{eventsManager},
 	playerSize{playerSize},
 	maxSpeed{ maxSpeed },
+	originalMaxSpeed{ maxSpeed},
 	floorPos{ windowSize.y - playerSize.y },
 	velocity{0.0f, 0.0f}
 {
@@ -66,7 +67,7 @@ const sf::Drawable& Player::update(float deltaTime)
 
 	calculateSideMovement(deltaTime);
 
-	// start moving the player towards the bottom of the screen
+	// Flying state
 	if (!canJump)
 	{
 		velocity.y += deltaTime * gravity;
@@ -75,23 +76,30 @@ const sf::Drawable& Player::update(float deltaTime)
 	pos.x += velocity.x * deltaTime;
 	pos.y += velocity.y * deltaTime;
 
-	// make sure that you cannot go lower than the screen
+	// You hit the ground reset everything
 	if (pos.y >= floorPos)
 	{
 		pos.y = floorPos;
 		canJump = true;
+
+		// if you are no longer jumping then reset the speed boost
+		if (!(keys & BIT(0) || keys & BIT(3)))
+		{
+			maxSpeed = originalMaxSpeed;
+			jumpForce = -1.5f;
+		}
 	}
 
 	// check if the user has hit a wall
 	if (pos.x <= 0.0f)
 	{
 		pos.x = 0.0f;
-		calculateWallBounce();
+		calculateWallBounce(deltaTime);
 	}
 	if (pos.x >= windowSize.x - playerSize.x)
 	{
 		pos.x = windowSize.x - playerSize.x;
-		calculateWallBounce();
+		calculateWallBounce(deltaTime);
 	}
 
 	sprite.setPosition(pos);
@@ -155,7 +163,7 @@ void Player::handleKeyReleased(KeyReleasedEvent* ev)
 	}
 }
 
-void Player::calculateWallBounce()
+void Player::calculateWallBounce(float deltaTime)
 {
 	// if you have upward velocity and Space / W is pressed
 	// then bounce of the wall in the opposite direction
@@ -171,6 +179,10 @@ void Player::calculateWallBounce()
 		{
 			velocity.x = maxSpeed;
 		}
+
+		// Increased the speed if you are constantly jumping and hitting side walls
+		maxSpeed = std::min(maxSpeed + (speedIncreaseOverTime * deltaTime), 1.3f);
+		jumpForce = std::max(jumpForce - (speedIncreaseOverTime * deltaTime), -2.3f);
 	}
 }
 

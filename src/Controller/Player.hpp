@@ -32,7 +32,7 @@ private:
 	void handleKeyPressed(KeyPressedEvent* ev);
 	void handleKeyReleased(KeyReleasedEvent *ev);
 
-	void calculateWallBounce();
+	void calculateWallBounce(float deltaTime);
 	void calculateSideMovement(float deltaTime);
 
 private:
@@ -49,14 +49,17 @@ private:
 	sf::Vector2f pos;
 	glm::vec2 velocity = {0.0f, 0.0f};
 	bool canJump = true;
+	float originalMaxSpeed;
 	float maxSpeed;
 	const float decceleration = 0.005f;
 	const float acceleration = .01f;
-	const float jumpForce = -1.5f;
+	float jumpForce = -1.5f;
 	const float sideInJumpControl = 0.1f;
 	const float gravity = 0.005f;
 	float floorPos = 0.0f;
 	float shouldIgnoreSideInputs = false;
+
+	float speedIncreaseOverTime = 0.001f;
 
 	char keys = 0x00;
 };
