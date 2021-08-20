@@ -3,14 +3,16 @@
 #include "Player.hpp"
 #include "../common/bit.hpp"
 
-Player::Player(const sf::Vector2u& windowSize, EventsManager* eventsManager, const glm::vec2& playerSize, const float& maxSpeed) noexcept
+Player::Player(const sf::Vector2u& windowSize, EventsManager* eventsManager, 
+	const glm::vec2& playerSize, const float& maxSpeed, const ObstacleManager* obstacleManager) noexcept
 	:windowSize{windowSize},
 	eventsManager{eventsManager},
 	playerSize{playerSize},
 	maxSpeed{ maxSpeed },
 	originalMaxSpeed{ maxSpeed},
 	floorPos{ windowSize.y - playerSize.y },
-	velocity{0.0f, 0.0f}
+	velocity{0.0f, 0.0f},
+	obstacleManager{obstacleManager}
 {
 	initialize();
 }
@@ -59,6 +61,7 @@ void Player::initialize()
 
 const sf::Drawable& Player::update(float deltaTime)
 {
+	// check if the user can jump
 	if ((keys & BIT(0) || keys & BIT(3)) && canJump) // W / Space go up
 	{
 		velocity.y = jumpForce;
@@ -73,34 +76,13 @@ const sf::Drawable& Player::update(float deltaTime)
 		velocity.y += deltaTime * gravity;
 	}
 
+	// update the users position
 	pos.x += velocity.x * deltaTime;
 	pos.y += velocity.y * deltaTime;
 
-	// You hit the ground reset everything
-	if (pos.y >= floorPos)
-	{
-		pos.y = floorPos;
-		canJump = true;
-
-		// if you are no longer jumping then reset the speed boost
-		if (!(keys & BIT(0) || keys & BIT(3)))
-		{
-			maxSpeed = originalMaxSpeed;
-			jumpForce = -1.5f;
-		}
-	}
-
-	// check if the user has hit a wall
-	if (pos.x <= 0.0f)
-	{
-		pos.x = 0.0f;
-		calculateWallBounce(deltaTime);
-	}
-	if (pos.x >= windowSize.x - playerSize.x)
-	{
-		pos.x = windowSize.x - playerSize.x;
-		calculateWallBounce(deltaTime);
-	}
+	// do collision detection
+	collision(deltaTime);
+	calculateObstacleCollision(deltaTime);
 
 	sprite.setPosition(pos);
 
@@ -211,6 +193,53 @@ void Player::calculateSideMovement(float deltaTime)
 	else if (keys & BIT(2)) // D go right
 	{
 		velocity.x = std::min(velocity.x + (acceleration * sideInJumpControl * deltaTime), maxSpeed);
+	}
+}
+
+void Player::collision(float deltaTime)
+{
+	// You hit the ground reset everything
+	if (pos.y >= floorPos)
+	{
+		pos.y = floorPos;
+		canJump = true;
+
+		// if you are no longer jumping then reset the speed boost
+		if (!(keys & BIT(0) || keys & BIT(3)))
+		{
+			maxSpeed = originalMaxSpeed;
+			jumpForce = -1.5f;
+		}
+	}
+
+	// check if the user has hit a wall
+	if (pos.x <= 0.0f)
+	{
+		pos.x = 0.0f;
+		calculateWallBounce(deltaTime);
+	}
+	if (pos.x >= windowSize.x - playerSize.x)
+	{
+		pos.x = windowSize.x - playerSize.x;
+		calculateWallBounce(deltaTime);
+	}
+
+}
+
+void Player::calculateObstacleCollision(float deltaTime)
+{
+	// Go through all the obstacles
+	/*
+	you can bounce off the side walls and it will launch you in the opposite direction
+	You can also bounce off the top
+	Hitting the roof results in the velocity.being set to 0
+	*/
+	const std::vector<sf::RectangleShape> obstacles = obstacleManager->getObstacles();
+	for (const auto& obstacle : obstacles)
+	{
+		// if you hit the bottom of the obstacle then set velocity.y to 0
+		sf::FloatRect obstacleBounds = obstacle.getGlobalBounds();
+		//if (obstacleBounds.)
 	}
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../EventSystem/KeyboardEvent.hpp"
+#include "../Obstacles/ObstaclesManager.hpp"
 #include <glm/glm.hpp>
 
 /*
@@ -14,7 +15,8 @@ public:
 		const sf::Vector2u& windowSize,
 		EventsManager* eventsManager,
 		const glm::vec2& playerSize,
-		const float& maxSpeed
+		const float& maxSpeed,
+		const ObstacleManager* obstacleManager
 	) noexcept;
 
 	~Player() noexcept;
@@ -34,6 +36,8 @@ private:
 
 	void calculateWallBounce(float deltaTime);
 	void calculateSideMovement(float deltaTime);
+	void collision(float deltaTime);
+	void calculateObstacleCollision(float deltaTime);
 
 private:
 	sf::Texture texture;
@@ -42,6 +46,7 @@ private:
 	sf::Vector2u windowSize;
 
 	EventsManager* eventsManager;
+	const ObstacleManager* obstacleManager;
 	glm::vec2 playerSize;
 
 

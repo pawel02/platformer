@@ -4,6 +4,7 @@
 
 #include "../EventSystem/Event.hpp"
 #include "../Controller/Player.hpp"
+#include "../Obstacles/ObstaclesManager.hpp"
 
 /*
 Manages the whole game things such as spawning the player
@@ -25,6 +26,7 @@ private:
 	EventsManager eventsManager;
 
 	Player player;
+	ObstacleManager obstacleManager;
 
 	sf::Clock clock;
 	sf::Int32 currTime;
