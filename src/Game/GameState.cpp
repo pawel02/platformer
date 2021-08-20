@@ -2,9 +2,11 @@
 #include "../EventSystem/KeyboardEvent.hpp"
 
 GameState::GameState(unsigned int windowWidth, unsigned int windowHeight) noexcept
-	:window{ sf::VideoMode{windowWidth, windowHeight}, "Platformer"}
+	:window{ sf::VideoMode{windowWidth, windowHeight}, "Platformer"},
+	currTime{ clock.getElapsedTime().asMilliseconds() },
+	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 1 }
 {
-
+	initialize();
 }
 
 GameState::~GameState() noexcept
@@ -15,7 +17,6 @@ GameState::~GameState() noexcept
 void GameState::initialize() noexcept
 {
 	window.setFramerateLimit(120.0f);
-	currTime = clock.getElapsedTime().asMilliseconds();
 }
 
 int GameState::gameLoop()
@@ -50,6 +51,14 @@ int GameState::gameLoop()
 		}
 
 		window.clear();
+
+		// calcualte deltaTime
+		float deltaTime = (currTime - clock.getElapsedTime().asMicroseconds()) / 1000.0f;
+		currTime = clock.getElapsedTime().asMicroseconds();
+		clock.restart();
+
+		window.draw(player.update(deltaTime));
+
 		window.display();
 	}
 

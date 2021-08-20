@@ -23,14 +23,28 @@ file(GLOB_RECURSE GAME
     PRIVATE "${PROJECT_SOURCE_DIR}/src/Game/*.cpp"
 )
 
+file(GLOB_RECURSE COMMON 
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/Common/*.hpp"
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/Common/*.cpp"
+)
+
+file(GLOB_RECURSE CONTROLLER 
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/Controller/*.hpp"
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/Controller/*.cpp"
+)
+
 add_executable(${PROJECT_NAME} 
     ${SOURCES}
     ${EVENTSYSTEM}
     ${GAME}
+    ${COMMON}
+    ${CONTROLLER}
 )
 
 source_group("Game"                       FILES ${GAME})
 source_group("EventSystem"                FILES ${EVENTSYSTEM})
+source_group("Common"                     FILES ${COMMON})
+source_group("Controller"                 FILES ${CONTROLLER})
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE "C:/libs/SFML/lib-static/include"

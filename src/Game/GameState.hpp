@@ -3,11 +3,12 @@
 #include <SFML/Graphics.hpp>
 
 #include "../EventSystem/Event.hpp"
+#include "../Controller/Player.hpp"
+
 /*
 Manages the whole game things such as spawning the player
 Main game loop etc
 */
-
 class GameState
 {
 public:
@@ -22,6 +23,8 @@ private:
 private:
 	sf::RenderWindow window;
 	EventsManager eventsManager;
+
+	Player player;
 
 	sf::Clock clock;
 	sf::Int32 currTime;
