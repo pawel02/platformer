@@ -20,6 +20,8 @@ public:
 	~Player() noexcept;
 
 	const sf::Drawable& update(float deltaTime);
+
+
 private:
 
 	/*
@@ -27,14 +29,22 @@ private:
 	*/
 	void initialize();
 
+	void handleKeyPressed(KeyPressedEvent* ev);
+	void handleKeyReleased(KeyReleasedEvent *ev);
+
 private:
 	sf::Texture texture;
 	sf::Sprite sprite;
+	sf::Vector2f pos;
 
 	sf::Vector2u windowSize;
 
 	EventsManager* eventsManager;
 	glm::vec2 playerSize;
 
+	glm::vec2 velocity;
+
 	float movementSpeed;
+
+	char keys = 0x00;
 };

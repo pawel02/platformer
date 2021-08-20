@@ -4,7 +4,7 @@
 GameState::GameState(unsigned int windowWidth, unsigned int windowHeight) noexcept
 	:window{ sf::VideoMode{windowWidth, windowHeight}, "Platformer"},
 	currTime{ clock.getElapsedTime().asMilliseconds() },
-	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 1 }
+	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 0.7 }
 {
 	initialize();
 }
@@ -53,9 +53,8 @@ int GameState::gameLoop()
 		window.clear();
 
 		// calcualte deltaTime
-		float deltaTime = (currTime - clock.getElapsedTime().asMicroseconds()) / 1000.0f;
+		float deltaTime = static_cast<float>(clock.getElapsedTime().asMicroseconds() - currTime) / 1000.0f;
 		currTime = clock.getElapsedTime().asMicroseconds();
-		clock.restart();
 
 		window.draw(player.update(deltaTime));
 
