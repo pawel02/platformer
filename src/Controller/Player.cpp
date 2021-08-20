@@ -3,12 +3,13 @@
 #include "Player.hpp"
 #include "../common/bit.hpp"
 
-Player::Player(const sf::Vector2u& windowSize, EventsManager* eventsManager, const glm::vec2& playerSize, const float& movementSpeed) noexcept
+Player::Player(const sf::Vector2u& windowSize, EventsManager* eventsManager, const glm::vec2& playerSize, const float& maxSpeed) noexcept
 	:windowSize{windowSize},
 	eventsManager{eventsManager},
 	playerSize{playerSize},
-	movementSpeed{movementSpeed},
-	floorPos{ windowSize.y - playerSize.y }
+	maxSpeed{ maxSpeed },
+	floorPos{ windowSize.y - playerSize.y },
+	velocity{0.0f, 0.0f}
 {
 	initialize();
 }
@@ -57,46 +58,40 @@ void Player::initialize()
 
 const sf::Drawable& Player::update(float deltaTime)
 {
-	float deltaSpeed = deltaTime * movementSpeed;
 	if ((keys & BIT(0) || keys & BIT(3)) && canJump) // W / Space go up
 	{
-		velocity.y -= 5.0f;
+		velocity.y = jumpForce;
 		canJump = false;
 	}
 
-	// slowly decrease the velocity when the keys are not down
-	if (!(keys & BIT(2) || keys & BIT(1)))
-	{
-		if (velocity.x > 0.0f)
-			velocity.x = std::max(velocity.x - (slowDownSpeed * deltaSpeed), 0.0f);
-		if (velocity.x < 0.0f)
-			velocity.x = std::min(velocity.x + (slowDownSpeed * deltaSpeed), 0.0f);
-	}
-	if (keys & BIT(1)) // A go left
-	{
-		velocity.x = std::max(velocity.x - deltaSpeed, -40.0f);
-	}
-	if (keys & BIT(2)) // D go right
-	{
-		velocity.x = std::min(velocity.x + deltaSpeed, 40.0f);
-	}
-
-	velocity.x /= 3;
+	calculateSideMovement(deltaTime);
 
 	// start moving the player towards the bottom of the screen
 	if (!canJump)
 	{
-		velocity.y += deltaSpeed * gravity;
+		velocity.y += deltaTime * gravity;
 	}
-	
-	pos.x += velocity.x;
-	pos.y += velocity.y;
+
+	pos.x += velocity.x * deltaTime;
+	pos.y += velocity.y * deltaTime;
 
 	// make sure that you cannot go lower than the screen
 	if (pos.y >= floorPos)
 	{
 		pos.y = floorPos;
 		canJump = true;
+	}
+
+	// check if the user has hit a wall
+	if (pos.x <= 0.0f)
+	{
+		pos.x = 0.0f;
+		calculateWallBounce();
+	}
+	if (pos.x >= windowSize.x - playerSize.x)
+	{
+		pos.x = windowSize.x - playerSize.x;
+		calculateWallBounce();
 	}
 
 	sprite.setPosition(pos);
@@ -157,6 +152,53 @@ void Player::handleKeyReleased(KeyReleasedEvent* ev)
 			keys ^= BIT(3);
 			break;
 		}
+	}
+}
+
+void Player::calculateWallBounce()
+{
+	// if you have upward velocity and Space / W is pressed
+	// then bounce of the wall in the opposite direction
+	if (velocity.y < 0.0f
+		&& (keys & BIT(0) || keys & BIT(3)))
+	{
+		velocity.y = jumpForce;
+		if (velocity.x >= 0.0f)
+		{
+			velocity.x = -maxSpeed;
+		}
+		else
+		{
+			velocity.x = maxSpeed;
+		}
+	}
+}
+
+void Player::calculateSideMovement(float deltaTime)
+{
+	// slowly decrease the velocity when the keys are not down
+	if (velocity.x > 0.0f && canJump)
+		velocity.x = std::max(velocity.x - (decceleration * deltaTime), 0.0f);
+	if (velocity.x < 0.0f && canJump)
+		velocity.x = std::min(velocity.x + (decceleration * deltaTime), 0.0f);
+
+	if (keys & BIT(1) && canJump) // A go left
+	{
+		velocity.x = std::max(velocity.x - (acceleration * deltaTime), maxSpeed * -1.0f);
+	}
+	else if (keys & BIT(1))
+	{
+		velocity.x = std::max(velocity.x - (acceleration * sideInJumpControl * deltaTime), maxSpeed * -1.0f);
+	}
+
+
+	if (keys & BIT(2) && canJump) // D go right
+	{
+		velocity.x = std::min(velocity.x + (acceleration * deltaTime), maxSpeed);
+	}
+	else if (keys & BIT(2)) // D go right
+	{
+		velocity.x = std::min(velocity.x + (acceleration * sideInJumpControl * deltaTime), maxSpeed);
 	}
 }
 

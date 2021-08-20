@@ -4,7 +4,7 @@
 GameState::GameState(unsigned int windowWidth, unsigned int windowHeight) noexcept
 	:window{ sf::VideoMode{windowWidth, windowHeight}, "Platformer"},
 	currTime{ clock.getElapsedTime().asMilliseconds() },
-	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 0.7f }
+	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 0.5f }
 {
 	initialize();
 }
