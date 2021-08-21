@@ -249,7 +249,7 @@ void Player::calculateObstacleCollision(float deltaTime)
 			)
 		{
 			pos.y = obstacleBounds.top - playerSize.x;
-			velocity.y = 0.0f;
+			velocity.y = obstacleManager->getSpeed() * 2;
 			canJump = true;
 		}
 

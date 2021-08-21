@@ -32,7 +32,10 @@ private:
 
 	// How many obstacles should be spawned per second
 	float spawnRate = 1600.0f;
+	float spawnRateMin = 1000.0f;
+	float spawnRateMax = 1600.0f;
 	float lastUpdated = 0.0f;
 	float speed = 0.1f;
+	const float increaseSpeedOverTime = 0.000001f;
 
 };

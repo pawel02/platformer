@@ -58,7 +58,7 @@ private:
 	float maxSpeed;
 	const float decceleration = 0.005f;
 	const float acceleration = .01f;
-	float jumpForce = -1.5f;
+	float jumpForce = -1.2f;
 	const float sideInJumpControl = 0.1f;
 	const float gravity = 0.005f;
 	float floorPos = 0.0f;

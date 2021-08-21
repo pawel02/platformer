@@ -21,9 +21,12 @@ const std::vector<sf::RectangleShape>& ObstacleManager::update(float deltaTime)
 		lastUpdated = 0.0f;
 		std::random_device r;
 		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist(1000, 1600);
+		std::uniform_int_distribution<int> uniform_dist(spawnRateMin, spawnRateMax);
 		spawnRate = static_cast<float>(uniform_dist(e1));
 	}
+	speed += increaseSpeedOverTime * deltaTime;
+	spawnRateMin = std::max(spawnRateMin - (increaseSpeedOverTime * 2 * deltaTime), 500.0f);
+	spawnRateMax = std::max(spawnRateMax - (increaseSpeedOverTime * 2 * deltaTime), 700.0f);
 	// move all the obstacles down at a constant speed
 	for (auto& obstacle : obstacles)
 	{
@@ -49,7 +52,19 @@ void ObstacleManager::spawnObstacle() noexcept
 	std::random_device r;
 	std::default_random_engine e1(r());
 	std::uniform_int_distribution<int> uniform_dist(0, windowSize.x - 150);
-	(obstacles.end() - 1)->setPosition(uniform_dist(e1), 0);
+	int rand = uniform_dist(e1);
+
+	// make sure that you don't have an obstacle spawning right above the one below
+	if (obstacles.size() > 2)
+	{
+		while (rand > (obstacles.end() - 2)->getPosition().x - ((obstacles.end() - 2)->getSize().x / 2)
+			&& rand < (obstacles.end() - 2)->getPosition().x + ((obstacles.end() - 2)->getSize().x / 2)
+			)
+		{
+			rand = uniform_dist(e1);
+		}
+	}
+	(obstacles.end() - 1)->setPosition(rand, 0);
 }
 
 void ObstacleManager::initialize() noexcept
