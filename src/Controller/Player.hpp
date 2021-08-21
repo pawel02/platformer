@@ -67,4 +67,7 @@ private:
 	float speedIncreaseOverTime = 0.001f;
 
 	char keys = 0x00;
+
+	// for obstacles
+	bool shouldFall = false;
 };

@@ -4,8 +4,8 @@
 GameState::GameState(unsigned int windowWidth, unsigned int windowHeight) noexcept
 	:window{ sf::VideoMode{windowWidth, windowHeight}, "Platformer"},
 	currTime{ clock.getElapsedTime().asMilliseconds() },
-	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 0.5f },
-	obstacleManager{{windowWidth, windowHeight}}
+	obstacleManager{{windowWidth, windowHeight}},
+	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 0.5f, &obstacleManager }
 {
 	initialize();
 }

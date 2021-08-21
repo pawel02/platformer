@@ -237,9 +237,88 @@ void Player::calculateObstacleCollision(float deltaTime)
 	const std::vector<sf::RectangleShape> obstacles = obstacleManager->getObstacles();
 	for (const auto& obstacle : obstacles)
 	{
-		// if you hit the bottom of the obstacle then set velocity.y to 0
 		sf::FloatRect obstacleBounds = obstacle.getGlobalBounds();
-		//if (obstacleBounds.)
+
+		// if you hit either side then its just like hitting a wall 
+		// where you can bounce in the opposite direction
+		if (pos.x + playerSize.x >= obstacleBounds.left
+			&& pos.x <= obstacleBounds.left
+			&& (
+				pos.y + playerSize.y >= obstacleBounds.top
+				&& pos.y <= obstacleBounds.top + obstacleBounds.height
+				)
+			)
+		{
+			pos.x = obstacleBounds.left - playerSize.x;
+			calculateWallBounce(deltaTime);
+		}
+		else if (pos.x <= obstacleBounds.left + obstacleBounds.width
+			&& pos.x + playerSize.x >= obstacleBounds.left + obstacleBounds.width
+			&& (
+				pos.y + playerSize.y >= obstacleBounds.top
+				&& pos.y <= obstacleBounds.top + obstacleBounds.height
+				)
+			)
+		{
+			pos.x = obstacleBounds.left + obstacleBounds.width;
+			calculateWallBounce(deltaTime);
+		}
+
+		else
+		{
+			// if you hit the top part of an obstacle then let it behave just like hitting
+			// any other part of the ground
+			if (
+				obstacleBounds.intersects(sprite.getGlobalBounds()) &&
+				pos.y + playerSize.x >= obstacleBounds.top &&
+				pos.y < obstacleBounds.top
+				&& ((pos.x + playerSize.x >= obstacleBounds.left
+					&& pos.x + playerSize.x <= obstacleBounds.left + obstacleBounds.width
+					)
+					||
+					(pos.x >= obstacleBounds.left
+						&& pos.x <= obstacleBounds.left + obstacleBounds.width)
+					)
+				)
+			{
+				pos.y = obstacleBounds.top - playerSize.x;
+				velocity.y = 0.0f;
+				canJump = true;
+				shouldFall = true;
+			}
+			// if you walk off the object then start falling again to the ground
+			else if (shouldFall
+				&& !((pos.x + playerSize.x >= obstacleBounds.left
+					&& pos.x + playerSize.x <= obstacleBounds.left + obstacleBounds.width
+					)
+					||
+					(pos.x >= obstacleBounds.left
+						&& pos.x <= obstacleBounds.left + obstacleBounds.width)
+					)
+				)
+			{
+				canJump = false;
+				shouldFall = false;
+			}
+
+			// if you hit the bottom of the obstacle then set velocity.y to 0
+			if (
+				obstacleBounds.intersects(sprite.getGlobalBounds()) &&
+				pos.y <= obstacleBounds.top + obstacleBounds.height &&
+				pos.y + playerSize.y > obstacleBounds.top + obstacleBounds.height
+				&& ((pos.x + playerSize.x >= obstacleBounds.left
+					&& pos.x + playerSize.x <= obstacleBounds.left + obstacleBounds.width
+					)
+					||
+					(pos.x >= obstacleBounds.left
+						&& pos.x <= obstacleBounds.left + obstacleBounds.width)
+					)
+				)
+			{
+				pos.y = obstacleBounds.top + obstacleBounds.height;
+				velocity.y = 0.0f;
+			}
+		}
 	}
 }
 
