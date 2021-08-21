@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
-
+#pragma comment (lib, "legacy_stdio_definitions.lib")
 #include "../EventSystem/Event.hpp"
 #include "../Controller/Player.hpp"
 #include "../Obstacles/ObstaclesManager.hpp"
@@ -25,9 +25,17 @@ private:
 	sf::RenderWindow window;
 	EventsManager eventsManager;
 
+	sf::Font font;
+	sf::Text scoreText;
+
+	sf::Text deathText;
+	sf::Text deathScore;
+
 	Player player;
 	ObstacleManager obstacleManager;
 
 	sf::Clock clock;
 	sf::Int32 currTime;
+
+	bool hasDied = false;
 };

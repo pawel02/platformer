@@ -4,6 +4,13 @@
 #include "../Obstacles/ObstaclesManager.hpp"
 #include <glm/glm.hpp>
 
+struct PlayerInfo
+{
+	const sf::Drawable* sprite;
+	char playerState = 0x00;
+	unsigned int score = 0;
+};
+
 /*
 Player class that will move the player about and
 includes all of the collision detection algorithms
@@ -21,8 +28,10 @@ public:
 
 	~Player() noexcept;
 
-	const sf::Drawable& update(float deltaTime);
+	PlayerInfo update(float deltaTime);
 
+	// resets the player
+	void restart();
 
 private:
 
@@ -38,6 +47,8 @@ private:
 	void calculateSideMovement(float deltaTime);
 	void collision(float deltaTime);
 	void calculateObstacleCollision(float deltaTime);
+
+	void died();
 
 private:
 	sf::Texture texture;
@@ -67,4 +78,13 @@ private:
 	float speedIncreaseOverTime = 0.001f;
 
 	char keys = 0x00;
+
+	/*
+	0x00 = game started
+	0x01 = player went on first block
+	0x02 = player died
+	*/
+	char playerState = 0x00;
+	unsigned int score = 0;
+
 };

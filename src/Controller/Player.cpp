@@ -1,5 +1,4 @@
 #include <vector>
-#include <iostream>
 #include "Player.hpp"
 #include "../common/bit.hpp"
 
@@ -59,85 +58,128 @@ void Player::initialize()
 	sprite.setPosition(pos);
 }
 
-const sf::Drawable& Player::update(float deltaTime)
+PlayerInfo Player::update(float deltaTime)
 {
-	// check if the user can jump
-	if ((keys & BIT(0) || keys & BIT(3)) && canJump) // W / Space go up
+	if (playerState != 0x02)
 	{
-		velocity.y = jumpForce;
-		canJump = false;
+		// check if the user can jump
+		if ((keys & BIT(0) || keys & BIT(3)) && canJump) // W / Space go up
+		{
+			velocity.y = jumpForce;
+			canJump = false;
+		}
+
+		calculateSideMovement(deltaTime);
+
+		// adds gravity into the mix
+		velocity.y += deltaTime * gravity;
+
+		// update the users position
+		pos.x += velocity.x * deltaTime;
+		pos.y += velocity.y * deltaTime;
+
+		// do collision detection
+		collision(deltaTime);
+		calculateObstacleCollision(deltaTime);
+
+		// if you hit the ground after starting then you lost
+		if (pos.y + playerSize.y >= windowSize.y && playerState == 0x01)
+		{
+			died();
+		}
+		else
+		{
+			// add some score
+			score += static_cast<unsigned int>(0.5f * deltaTime);
+		}
+
+		sprite.setPosition(pos);
 	}
+	
+	return 
+	{
+		&sprite,
+		playerState,
+		score
+	};
+}
 
-	calculateSideMovement(deltaTime);
+void Player::restart()
+{
+	pos = { (windowSize.x / 2) - (playerSize.x / 2), floorPos };
 
-	// adds gravity into the mix
-	velocity.y += deltaTime * gravity;
+	velocity = { 0.0f, 0.0f };
+	canJump = true;
+	maxSpeed = originalMaxSpeed;
+	jumpForce = -1.2f;
+	shouldIgnoreSideInputs = false;
 
-	// update the users position
-	pos.x += velocity.x * deltaTime;
-	pos.y += velocity.y * deltaTime;
+	speedIncreaseOverTime = 0.001f;
 
-	// do collision detection
-	collision(deltaTime);
-	calculateObstacleCollision(deltaTime);
-
+	keys = 0x00;
+	playerState = 0x00;
+	score = 0;
 	sprite.setPosition(pos);
-
-	return sprite;
 }
 
 
 
 void Player::handleKeyPressed(KeyPressedEvent* ev)
 {
-	switch (ev->getKeyCode())
+	if (playerState != 0x02)
 	{
-		case sf::Keyboard::W:
+		switch (ev->getKeyCode())
 		{
-			keys |= BIT(0);
-			break;
-		}
-		case sf::Keyboard::A:
-		{
-			keys |= BIT(1);
-			break;
-		}
-		case sf::Keyboard::D:
-		{
-			keys |= BIT(2);
-			break;
-		}
-		case sf::Keyboard::Space:
-		{
-			keys |= BIT(3);
-			break;
+			case sf::Keyboard::W:
+			{
+				keys |= BIT(0);
+				break;
+			}
+			case sf::Keyboard::A:
+			{
+				keys |= BIT(1);
+				break;
+			}
+			case sf::Keyboard::D:
+			{
+				keys |= BIT(2);
+				break;
+			}
+			case sf::Keyboard::Space:
+			{
+				keys |= BIT(3);
+				break;
+			}
 		}
 	}
 }
 
 void Player::handleKeyReleased(KeyReleasedEvent* ev)
 {
-	switch (ev->getKeyCode())
+	if (playerState != 0x02)
 	{
-		case sf::Keyboard::W:
+		switch (ev->getKeyCode())
 		{
-			keys ^= BIT(0);
-			break;
-		}
-		case sf::Keyboard::A:
-		{
-			keys ^= BIT(1);
-			break;
-		}
-		case sf::Keyboard::D:
-		{
-			keys ^= BIT(2);
-			break;
-		}
-		case sf::Keyboard::Space:
-		{
-			keys ^= BIT(3);
-			break;
+			case sf::Keyboard::W:
+			{
+				keys ^= BIT(0);
+				break;
+			}
+			case sf::Keyboard::A:
+			{
+				keys ^= BIT(1);
+				break;
+			}
+			case sf::Keyboard::D:
+			{
+				keys ^= BIT(2);
+				break;
+			}
+			case sf::Keyboard::Space:
+			{
+				keys ^= BIT(3);
+				break;
+			}
 		}
 	}
 }
@@ -251,6 +293,11 @@ void Player::calculateObstacleCollision(float deltaTime)
 			pos.y = obstacleBounds.top - playerSize.x;
 			velocity.y = obstacleManager->getSpeed() * 2;
 			canJump = true;
+
+			if (playerState == 0x00)
+			{
+				playerState = 0x01;
+			}
 		}
 
 		// if you hit the bottom of the obstacle then set velocity.y to twice the speed of obstacles
@@ -299,6 +346,12 @@ void Player::calculateObstacleCollision(float deltaTime)
 	
 	}
 }
+
+void Player::died()
+{
+	playerState = 0x02;
+}
+
 
 
 

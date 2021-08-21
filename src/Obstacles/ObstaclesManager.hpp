@@ -21,9 +21,9 @@ public:
 	const std::vector<sf::RectangleShape>& update(float deltaTime);
 
 	const float& getSpeed() const noexcept { return speed; }
+	void restart() noexcept;
 
 private:
-	void initialize() noexcept;
 	void spawnObstacle() noexcept;
 
 private:

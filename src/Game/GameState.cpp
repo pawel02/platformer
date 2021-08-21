@@ -12,12 +12,35 @@ GameState::GameState(unsigned int windowWidth, unsigned int windowHeight) noexce
 
 GameState::~GameState() noexcept
 {
-
 }
 
 void GameState::initialize() noexcept
 {
 	window.setFramerateLimit(120.0f);
+	if (!font.loadFromFile("../res/roboto.ttf"))
+	{	
+		// TODO log that could not load font
+	}
+
+	scoreText.setFont(font);
+	deathText.setFont(font);
+	deathScore.setFont(font);
+
+	scoreText.setString("0");
+	scoreText.setCharacterSize(20);
+	scoreText.setColor(sf::Color::White);
+	scoreText.setPosition(5, 5);
+
+	deathText.setString("       YOU DIED!!!\nPress space to restart");
+	deathText.setCharacterSize(32);
+	deathText.setColor(sf::Color::White);
+	deathText.setStyle(sf::Text::Bold);
+	deathText.setPosition(window.getSize().x / 2 - (deathText.getLocalBounds().width / 2), window.getSize().y / 2 - (deathText.getCharacterSize() / 2));
+
+	deathScore.setString("Score: 0");
+	deathScore.setCharacterSize(24);
+	deathScore.setColor(sf::Color::White);
+	deathScore.setPosition(window.getSize().x / 2 - (deathText.getLocalBounds().width / 2), (window.getSize().y / 2 - (deathText.getCharacterSize() / 2)) + 90);
 }
 
 int GameState::gameLoop()
@@ -37,6 +60,12 @@ int GameState::gameLoop()
 				case (sf::Event::KeyPressed):
 				{
 					eventsManager.dispatch(ev.type, std::make_shared<KeyPressedEvent>(ev.key.code));
+					if (ev.key.code == sf::Keyboard::Space && hasDied)
+					{
+						player.restart();
+						obstacleManager.restart();
+						hasDied = false;
+					}
 					break;
 				}
 				case (sf::Event::KeyReleased):
@@ -57,12 +86,32 @@ int GameState::gameLoop()
 		float deltaTime = static_cast<float>(clock.getElapsedTime().asMicroseconds() - currTime) / 1000.0f;
 		currTime = clock.getElapsedTime().asMicroseconds();
 
-		const std::vector<sf::RectangleShape> obstacles = obstacleManager.update(deltaTime);
-		for (const auto& obstacle : obstacles)
+		if (!hasDied)
 		{
-			window.draw(obstacle);
+			const std::vector<sf::RectangleShape> obstacles = obstacleManager.update(deltaTime);
+			for (const auto& obstacle : obstacles)
+			{
+				window.draw(obstacle);
+			}
 		}
-		window.draw(player.update(deltaTime));
+		
+
+		PlayerInfo playerInfo = player.update(deltaTime);
+		if (playerInfo.playerState == 0x02)
+		{
+			// Show the death screen with a final score
+			hasDied = true;
+			deathScore.setString("Final score: " + std::to_string(playerInfo.score));
+			window.draw(deathText);
+			window.draw(deathScore);
+		}
+		else
+		{
+			window.draw(*playerInfo.sprite);
+			scoreText.setString("Score: " + std::to_string(playerInfo.score));
+			window.draw(scoreText);
+
+		}
 
 		window.display();
 	}

@@ -5,11 +5,20 @@
 ObstacleManager::ObstacleManager(const sf::Vector2u& windowSize) noexcept
 	:windowSize{windowSize}
 {
-	initialize();
 }
 
 ObstacleManager::~ObstacleManager() noexcept
 {
+}
+
+void ObstacleManager::restart() noexcept
+{
+	obstacles.clear();
+	spawnRate = 1600.0f;
+	spawnRateMin = 1000.0f;
+	spawnRateMax = 1600.0f;
+	lastUpdated = 0.0f;
+	speed = 0.1f;
 }
 
 const std::vector<sf::RectangleShape>& ObstacleManager::update(float deltaTime)
@@ -65,10 +74,4 @@ void ObstacleManager::spawnObstacle() noexcept
 		}
 	}
 	(obstacles.end() - 1)->setPosition(rand, 0);
-}
-
-void ObstacleManager::initialize() noexcept
-{
-	// For the moment only create 1 obstacle
-	// so that I can test the collisions with the player
 }
