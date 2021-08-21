@@ -21,6 +21,16 @@ void ObstacleManager::initialize() noexcept
 	// For the moment only create 1 obstacle
 	// so that I can test the collisions with the player
 	obstacles.emplace_back(sf::RectangleShape{ {100.0f, 100.0f} });
+	obstacles.emplace_back(sf::RectangleShape{ {100.0f, 100.0f} });
+	obstacles.emplace_back(sf::RectangleShape{ {50.0f, 100.0f} });
+
+
 	obstacles[0].setFillColor(sf::Color::White);
 	obstacles[0].setPosition(500, 700);
+
+	obstacles[1].setFillColor(sf::Color::Blue);
+	obstacles[1].setPosition(200, 700);
+
+	obstacles[2].setFillColor(sf::Color::Blue);
+	obstacles[2].setPosition(400, 700);
 }

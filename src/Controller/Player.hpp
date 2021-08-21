@@ -69,5 +69,5 @@ private:
 	char keys = 0x00;
 
 	// for obstacles
-	bool shouldFall = false;
+	std::vector<bool> shouldFall;
 };
