@@ -31,7 +31,7 @@ void GameState::initialize() noexcept
 	scoreText.setColor(sf::Color::White);
 	scoreText.setPosition(5, 5);
 
-	deathText.setString("       YOU DIED!!!\nPress space to restart");
+	deathText.setString("       YOU DIED GG!!!\nPress space to restart");
 	deathText.setCharacterSize(32);
 	deathText.setColor(sf::Color::White);
 	deathText.setStyle(sf::Text::Bold);

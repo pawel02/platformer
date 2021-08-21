@@ -87,7 +87,7 @@ PlayerInfo Player::update(float deltaTime)
 		{
 			died();
 		}
-		else
+		else if (playerState == 0x01)
 		{
 			// add some score
 			score += static_cast<unsigned int>(0.5f * deltaTime);
