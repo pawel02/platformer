@@ -1,7 +1,7 @@
 #include "Game/GameState.hpp"
 int main()
 {
-    GameState game{ 800, 900 };
+    GameState game{ 600, 900 };
 
     return game.gameLoop();
 }

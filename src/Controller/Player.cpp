@@ -70,11 +70,8 @@ const sf::Drawable& Player::update(float deltaTime)
 
 	calculateSideMovement(deltaTime);
 
-	// Flying state
-	if (!canJump)
-	{
-		velocity.y += deltaTime * gravity;
-	}
+	// adds gravity into the mix
+	velocity.y += deltaTime * gravity;
 
 	// update the users position
 	pos.x += velocity.x * deltaTime;
@@ -235,7 +232,7 @@ void Player::calculateObstacleCollision(float deltaTime)
 	Hitting the roof results in the velocity.being set to 0
 	*/
 	const std::vector<sf::RectangleShape> obstacles = obstacleManager->getObstacles();
-	shouldFall.resize(obstacles.size());
+
 	for (size_t i = 0; i < obstacles.size(); i++)
 	{
 		sf::FloatRect obstacleBounds = obstacles[i].getGlobalBounds();
@@ -254,19 +251,10 @@ void Player::calculateObstacleCollision(float deltaTime)
 			pos.y = obstacleBounds.top - playerSize.x;
 			velocity.y = 0.0f;
 			canJump = true;
-			shouldFall[i] = true;
-		}
-		// if you walk off the object then start falling again to the ground
-		else if (shouldFall[i]
-			&& (pos.x + playerSize.x < obstacleBounds.left
-				|| pos.x > obstacleBounds.left + obstacleBounds.width)
-			)
-		{
-			canJump = false;
-			shouldFall[i] = false;
 		}
 
-		// if you hit the bottom of the obstacle then set velocity.y to 0
+		// if you hit the bottom of the obstacle then set velocity.y to twice the speed of obstacles
+		// start falling
 		if (
 			obstacleBounds.intersects(sprite.getGlobalBounds()) &&
 			pos.y <= obstacleBounds.top + obstacleBounds.height &&
@@ -276,7 +264,7 @@ void Player::calculateObstacleCollision(float deltaTime)
 			)
 		{
 			pos.y = obstacleBounds.top + obstacleBounds.height;
-			velocity.y = 0.0f;
+			velocity.y = obstacleManager->getSpeed() * 2;
 		}
 		// if you hit either side then its just like hitting a wall 
 		// where you can bounce in the opposite direction

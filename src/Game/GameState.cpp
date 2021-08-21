@@ -5,7 +5,7 @@ GameState::GameState(unsigned int windowWidth, unsigned int windowHeight) noexce
 	:window{ sf::VideoMode{windowWidth, windowHeight}, "Platformer"},
 	currTime{ clock.getElapsedTime().asMilliseconds() },
 	obstacleManager{{windowWidth, windowHeight}},
-	player{ {windowWidth, windowHeight}, &eventsManager, {50, 50}, 0.5f, &obstacleManager }
+	player{ {windowWidth, windowHeight}, &eventsManager, {30, 30}, 0.5f, &obstacleManager }
 {
 	initialize();
 }
@@ -57,13 +57,12 @@ int GameState::gameLoop()
 		float deltaTime = static_cast<float>(clock.getElapsedTime().asMicroseconds() - currTime) / 1000.0f;
 		currTime = clock.getElapsedTime().asMicroseconds();
 
-		window.draw(player.update(deltaTime));
-
-		const std::vector<sf::RectangleShape> obstacles = obstacleManager.getObstacles();
+		const std::vector<sf::RectangleShape> obstacles = obstacleManager.update(deltaTime);
 		for (const auto& obstacle : obstacles)
 		{
 			window.draw(obstacle);
 		}
+		window.draw(player.update(deltaTime));
 
 		window.display();
 	}

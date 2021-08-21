@@ -18,16 +18,21 @@ public:
 	~ObstacleManager() noexcept;
 
 	const std::vector<sf::RectangleShape>& getObstacles() const noexcept { return obstacles; }
-	const std::vector<sf::RectangleShape>& update();
+	const std::vector<sf::RectangleShape>& update(float deltaTime);
+
+	const float& getSpeed() const noexcept { return speed; }
 
 private:
 	void initialize() noexcept;
+	void spawnObstacle() noexcept;
 
 private:
 	sf::Vector2u windowSize;
 	std::vector<sf::RectangleShape> obstacles;
 
 	// How many obstacles should be spawned per second
-	const float spawnRate = 1.0f;
+	float spawnRate = 1600.0f;
+	float lastUpdated = 0.0f;
+	float speed = 0.1f;
 
 };
