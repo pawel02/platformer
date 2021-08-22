@@ -5,6 +5,10 @@
 ObstacleManager::ObstacleManager(const sf::Vector2u& windowSize) noexcept
 	:windowSize{windowSize}
 {
+	if (!texture.loadFromFile("../res/obstacle.png"))
+	{
+		// TODO
+	}
 }
 
 ObstacleManager::~ObstacleManager() noexcept
@@ -42,7 +46,7 @@ const std::vector<sf::RectangleShape>& ObstacleManager::update(float deltaTime)
 		obstacle.setPosition(obstacle.getPosition().x, obstacle.getPosition().y + (speed * deltaTime));
 
 		// When the obstacle reaches the bottom remove it
-		if (obstacle.getPosition().y + obstacle.getSize().y > windowSize.y)
+		if (obstacle.getPosition().y + obstacle.getSize().y > windowSize.y + obstacle.getSize().y)
 		{
 			obstacles.erase(std::find_if(std::begin(obstacles), std::end(obstacles), [&](sf::RectangleShape& element) {
 				return element.getGlobalBounds() == obstacle.getGlobalBounds();
@@ -57,7 +61,8 @@ void ObstacleManager::spawnObstacle() noexcept
 {
 	//simply adds an obstacle from the top
 	obstacles.emplace_back(sf::RectangleShape{ {150.0f, 20.0f} });
-	(obstacles.end() - 1)->setFillColor(sf::Color::White);
+
+	(obstacles.end() - 1)->setTexture(&texture);
 	std::random_device r;
 	std::default_random_engine e1(r());
 	std::uniform_int_distribution<int> uniform_dist(0, windowSize.x - 150);
@@ -73,5 +78,5 @@ void ObstacleManager::spawnObstacle() noexcept
 			rand = uniform_dist(e1);
 		}
 	}
-	(obstacles.end() - 1)->setPosition(rand, 0);
+	(obstacles.end() - 1)->setPosition(rand, -20.0f);
 }

@@ -31,31 +31,34 @@ void Player::initialize()
 		handleKeyReleased(static_cast<KeyReleasedEvent*>(ev.get()));
 	});
 
-	// for the moment draw a red sprite
-	if (!texture.create(playerSize.x, playerSize.y))
+
+	if (!texture.loadFromFile("../res/sprite.png"))
 	{
-		// TODO: Add to the logging system that could not load the texture
+		// TODO
 	}
 
-	const int textureSize = playerSize.x * playerSize.y * 4;
-	std::vector<sf::Uint8> pixels;
-	pixels.resize(textureSize);
-
-	for (size_t i = 0; i < textureSize; i+=4)
-	{
-		pixels[i] =     255; // r
-		pixels[i + 1] = 0;   // g
-		pixels[i + 2] = 0;   // b
-		pixels[i + 3] = 255; // a
-	}
-
-	texture.update(pixels.data());
 	texture.setSmooth(true);
 	sprite.setTexture(texture);
+	sprite.setScale(1.5, 1.5);
 
 	// put the sprite in the middle of the screen for now
 	pos = { (windowSize.x / 2) - (playerSize.x / 2), floorPos };
 	sprite.setPosition(pos);
+
+	// load the audio
+	if (!buffer.loadFromFile("../res/jump.wav"))
+	{
+		// TODO
+	}
+	sound.setBuffer(buffer);
+	sound.setVolume(4.0f);
+
+	if (!scoreSoundbuffer.loadFromFile("../res/reaching_score_10000.wav"))
+	{
+		// TODO
+	}
+	scoreSound.setBuffer(scoreSoundbuffer);
+
 }
 
 PlayerInfo Player::update(float deltaTime)
@@ -67,6 +70,7 @@ PlayerInfo Player::update(float deltaTime)
 		{
 			velocity.y = jumpForce;
 			canJump = false;
+			playJump();
 		}
 
 		calculateSideMovement(deltaTime);
@@ -91,6 +95,11 @@ PlayerInfo Player::update(float deltaTime)
 		{
 			// add some score
 			score += static_cast<unsigned int>(0.5f * deltaTime);
+			if (score > 10000 && !scoreSoundPlayed)
+			{
+				scoreSound.play();
+				scoreSoundPlayed = true;
+			}
 		}
 
 		sprite.setPosition(pos);
@@ -191,6 +200,7 @@ void Player::calculateWallBounce(float deltaTime)
 	if (velocity.y < 0.0f
 		&& (keys & BIT(0) || keys & BIT(3)))
 	{
+		playJump();
 		velocity.y = jumpForce;
 		if (velocity.x >= 0.0f)
 		{
@@ -350,6 +360,11 @@ void Player::calculateObstacleCollision(float deltaTime)
 void Player::died()
 {
 	playerState = 0x02;
+}
+
+void Player::playJump()
+{
+	sound.play();
 }
 
 

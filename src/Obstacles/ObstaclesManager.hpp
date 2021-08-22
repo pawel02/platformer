@@ -28,6 +28,7 @@ private:
 
 private:
 	sf::Vector2u windowSize;
+	sf::Texture texture;
 	std::vector<sf::RectangleShape> obstacles;
 
 	// How many obstacles should be spawned per second

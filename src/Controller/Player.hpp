@@ -1,8 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <glm/glm.hpp>
 #include "../EventSystem/KeyboardEvent.hpp"
 #include "../Obstacles/ObstaclesManager.hpp"
-#include <glm/glm.hpp>
 
 struct PlayerInfo
 {
@@ -50,9 +51,17 @@ private:
 
 	void died();
 
+	void playJump();
+
 private:
 	sf::Texture texture;
 	sf::Sprite sprite;
+	sf::SoundBuffer buffer;
+	sf::Sound sound;
+
+	sf::SoundBuffer scoreSoundbuffer;
+	sf::Sound scoreSound;
+	bool scoreSoundPlayed = false;
 
 	sf::Vector2u windowSize;
 

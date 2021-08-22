@@ -63,6 +63,6 @@ target_link_directories(${PROJECT_NAME}
 
 # debug linking
 target_link_libraries(${PROJECT_NAME} opengl32 winmm gdi32 freetype openal32 flac vorbisenc vorbisfile vorbis ogg ws2_32)
-target_link_libraries(${PROJECT_NAME} sfml-audio-s-d sfml-graphics-s-d sfml-main-d sfml-network-s-d sfml-system-s-d sfml-window-s-d)
+#target_link_libraries(${PROJECT_NAME} sfml-audio-s-d sfml-graphics-s-d sfml-main-d sfml-network-s-d sfml-system-s-d sfml-window-s-d)
 # only needed in release builds
-#target_link_libraries(${PROJECT_NAME} sfml-audio-s sfml-graphics-s sfml-main sfml-network-s sfml-system-s sfml-window-s)
+target_link_libraries(${PROJECT_NAME} sfml-audio-s sfml-graphics-s sfml-main sfml-network-s sfml-system-s sfml-window-s)
